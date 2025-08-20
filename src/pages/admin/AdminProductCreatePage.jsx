@@ -87,7 +87,7 @@ const AdminProductCreatePage = () => {
       // Replace this with your actual API call
 const token = localStorage.getItem('token'); // or from Redux/store
 
-const response = await fetch('http://localhost:5000/api/products', {
+const response = await fetch('https://store-backend-one-lemon.vercel.app/api/products', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',

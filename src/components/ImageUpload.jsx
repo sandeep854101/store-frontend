@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 
-const API_BASE_URL ='http://localhost:5000';
+const API_BASE_URL ='https://store-backend-one-lemon.vercel.app';
 
 const ImageUpload = ({ onUpload, maxFiles = 5, existingCount = 0 }) => {
   const [files, setFiles] = useState([]);
