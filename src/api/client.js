@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'https://store-backend-one-lemon.vercel.app/api';
+const API_URL = 'https://store-backend-v16l.onrender.com/api';
 
 const api = axios.create({
   baseURL: API_URL,
