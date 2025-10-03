@@ -17,7 +17,7 @@ const RegisterPage = () => {
 
   const submitHandler = async (e) => {
     e.preventDefault();
-    
+
     if (password !== confirmPassword) {
       toast.error('Passwords do not match');
       return;
@@ -25,13 +25,16 @@ const RegisterPage = () => {
 
     try {
       setLoading(true);
-      const { token, ...userData } = await register(name, email, password);
+
+      // ✅ send phone also
+      const { token, ...userData } = await register(name, email, phone, password);
+
       localStorage.setItem('token', token);
       setUserInfo(userData);
       toast.success('Registration successful');
       navigate('/');
     } catch (error) {
-      toast.error(error || 'Registration failed');
+      toast.error(error?.response?.data?.message || 'Registration failed');
     } finally {
       setLoading(false);
     }

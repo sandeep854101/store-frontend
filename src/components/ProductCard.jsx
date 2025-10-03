@@ -2,13 +2,19 @@ import { Link } from "react-router-dom";
 import { formatPrice } from "../utils/utils";
 
 const ProductCard = ({ product }) => {
+  // ✅ Support both single image (string) and old array format
+  const productImage =
+    typeof product.image === "string"
+      ? product.image
+      : product.images?.[0]?.url || "/images/default-product.png";
+
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
       <Link to={`/product/${product._id}`}>
         {/* Product Image */}
         <div className="h-48 overflow-hidden">
           <img
-            src={product.images[0]?.url || "/images/default-product.png"}
+            src={productImage}
             alt={product.name}
             className="w-full h-full object-cover"
           />

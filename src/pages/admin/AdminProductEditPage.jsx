@@ -1,25 +1,27 @@
 // client/src/pages/admin/AdminProductEditPage.jsx
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import { getProductDetails, updateProduct } from '../../api/productService';
-import ImageUpload from '../../components/ImageUpload';
-import Loading from '../../components/Loading';
-import Message from '../../components/Message';
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { getProductDetails, updateProduct } from "../../api/productService";
+import ImageUpload from "../../components/ImageUpload";
+import Loading from "../../components/Loading";
+import Message from "../../components/Message";
 
 const AdminProductEditPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+
   const [loading, setLoading] = useState(true);
+  const [updating, setUpdating] = useState(false);
   const [error, setError] = useState(null);
   const [product, setProduct] = useState({
-    name: '',
-    description: '',
+    name: "",
+    description: "",
     price: 0,
-    category: '',
-    brand: '',
+    category: "",
+    brand: "",
     stock: 0,
-    images: []
+    images: [],
   });
 
   useEffect(() => {
@@ -29,7 +31,7 @@ const AdminProductEditPage = () => {
         setProduct(data);
         setLoading(false);
       } catch (err) {
-        setError(err.message || 'Failed to load product');
+        setError(err.message || "Failed to load product");
         setLoading(false);
       }
     };
@@ -41,25 +43,37 @@ const AdminProductEditPage = () => {
     const { name, value } = e.target;
     setProduct({
       ...product,
-      [name]: value
+      [name]: ["price", "stock"].includes(name) ? Number(value) : value,
     });
   };
 
   const handleImageUpload = (uploadedImages) => {
     setProduct({
       ...product,
-      images: uploadedImages
+      images: uploadedImages,
     });
+  };
+
+  const handleRemoveImage = (index) => {
+    if (window.confirm("Are you sure you want to remove this image?")) {
+      setProduct({
+        ...product,
+        images: product.images.filter((_, i) => i !== index),
+      });
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setUpdating(true);
     try {
       await updateProduct(id, product);
-      toast.success('Product updated successfully');
-      navigate('/admin/products');
+      toast.success("✅ Product updated successfully");
+      navigate("/admin/products");
     } catch (error) {
-      toast.error(error.message || 'Failed to update product');
+      toast.error(error.message || "❌ Failed to update product");
+    } finally {
+      setUpdating(false);
     }
   };
 
@@ -68,18 +82,21 @@ const AdminProductEditPage = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold">Edit Product</h1>
         <button
-          onClick={() => navigate('/admin/products')}
+          onClick={() => navigate("/admin/products")}
           className="btn btn-outline"
         >
           Back to Products
         </button>
       </div>
 
+      {/* Form */}
       <div className="bg-white rounded-lg shadow-md p-6">
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Grid Inputs */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -155,6 +172,7 @@ const AdminProductEditPage = () => {
             </div>
           </div>
 
+          {/* Description */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Description
@@ -169,14 +187,17 @@ const AdminProductEditPage = () => {
             />
           </div>
 
+          {/* Images */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Product Images
             </label>
-            <ImageUpload 
-              onUpload={handleImageUpload} 
+            <ImageUpload
+              onUpload={handleImageUpload}
               existingImages={product.images}
             />
+
+            {/* Preview */}
             <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
               {product.images.map((image, index) => (
                 <div key={index} className="relative group">
@@ -187,37 +208,24 @@ const AdminProductEditPage = () => {
                   />
                   <button
                     type="button"
-                    onClick={() => {
-                      setProduct({
-                        ...product,
-                        images: product.images.filter((_, i) => i !== index)
-                      });
-                    }}
+                    onClick={() => handleRemoveImage(index)}
                     className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
+                    ✕
                   </button>
                 </div>
               ))}
             </div>
           </div>
 
+          {/* Submit */}
           <div className="pt-4">
-            <button type="submit" className="btn btn-primary w-full">
-              Update Product
+            <button
+              type="submit"
+              className="btn btn-primary w-full"
+              disabled={updating}
+            >
+              {updating ? "Updating..." : "Update Product"}
             </button>
           </div>
         </form>
